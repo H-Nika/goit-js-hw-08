@@ -126,4 +126,4 @@ function modal(image)
     if (event.code === 'Escape') {
       modal.close();
     }
-  }}
+  }} 
