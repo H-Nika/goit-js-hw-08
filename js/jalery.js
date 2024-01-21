@@ -66,55 +66,64 @@ const images = [
   },
 ];
 
-const galleryList = document.querySelector(".gallery");
-galleryList.addEventListener("click", onGallaryItemClick);
-let markup = "";
+const container = document.querySelector('.gallery')
 
-markup = images
-  .map(({ preview, original, description }) => {
+function galleryTemplate(images) {
+  const result = images.map((image) => {
     return `<li class="gallery-item">
-  <a class="gallery-link" href="${original}">
+  <a class="gallery-link" href="${image.original}">
     <img
       class="gallery-image"
-      src="${preview}"
-      data-source="${original}"
-      alt="${description}"
+      src="${image.preview}"
+      width="360px"
+      data-source="${image.original}"
+      alt="${image.description}"
     />
   </a>
-</li>`;
+</li>`
+  }).join("\n\n");
+  container.innerHTML = result;
+}
+
+galleryTemplate(images);
+
+
+
+
+container.addEventListener("click", event => {
+    event.preventDefault();
+  if (event.target === event.currentTarget) return;
+    const liElem = event.target;
+    const dataSource = liElem.dataset.source;
+    const image = images.find(el => el.original === dataSource);
+    modal(image);
   })
-  .join("");
 
-galleryList.insertAdjacentHTML("beforeend", markup);
 
-function onGallaryItemClick(e) {
-  e.preventDefault();
-  const imgElem = e.target.closest("img");
-  if (imgElem === null) return;
 
-  const modalImgSource = imgElem.dataset.source;
-  const openedModalImg = images.find(
-    (image) => image.original === modalImgSource
-  );
-  const description = openedModalImg.description;
 
-  const modal = basicLightbox.create(
-    `
-    <img src="${modalImgSource}" alt="${description}">
+function modal(image)
+{const modal = basicLightbox.create(`
+    <img
+      class="gallery-image"
+      src="${image.original}"
+      data-source="${image.original}"
+      alt="${image.description}"
+    />
 `,
-    {
-      onShow: (instance) => {
-        document.addEventListener("keydown", onModalClose);
-      },
-      onClose: (instance) => {
-        document.removeEventListener("keydown", onModalClose);
-      },
-    }
-  );
+  {
+    onShow: instance => {
+      document.addEventListener('keydown', onModalClose);
+    },
+    onClose: instance => {
+      document.removeEventListener('keydown', onModalClose);
+    },
+  },);
 
   modal.show();
 
-  function onModalClose(e) {
-    if (e.code === "Escape") modal.close();
-  }
-}
+  function onModalClose(event) {
+    if (event.code === 'Escape') {
+      modal.close();
+    }
+  }}
